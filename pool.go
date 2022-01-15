@@ -1,5 +1,9 @@
 package gopewl
 
+import (
+	"fmt"
+)
+
 // Job is a simple function that takes no arguments and returns no data. This is the basic operation that can be
 // scheduled into the worker pool.
 type Job func()
@@ -24,7 +28,13 @@ func (p *Pool) Close() {
 
 // NewPool returns a Pool with the amount of workers specified in `poolSize` and a queue with the buffer size
 // of `queueSize`
-func NewPool(poolSize int, queueSize int) Pool {
+func NewPool(poolSize int, queueSize int) (*Pool, error) {
+	if poolSize <= 0 {
+		return nil, fmt.Errorf("invalid pool size '%d'", poolSize)
+	}
+	if queueSize < 0 {
+		return nil, fmt.Errorf("invalid queue size '%d'", queueSize)
+	}
 	pool := Pool{
 		workers: make([]worker, poolSize),
 		queue: make(chan Job, queueSize),
@@ -34,5 +44,5 @@ func NewPool(poolSize int, queueSize int) Pool {
 		pool.workers[i] = w
 		go w.run()
 	}
-	return pool
+	return &pool, nil
 }
