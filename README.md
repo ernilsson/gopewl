@@ -1,4 +1,4 @@
-# gopewl
+# gopewl 🌊
 A simple package allowing quick capping of goroutines for rudimentary asynchronous tasks.
 
 ## Example
