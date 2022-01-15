@@ -3,6 +3,7 @@ package gopewl
 import (
 	"github.com/stretchr/testify/assert"
 	"runtime"
+	"sync"
 	"testing"
 )
 
@@ -50,4 +51,17 @@ func TestNewPool_wiresWorkersWithChannel(t *testing.T) {
 	for _, worker := range p.workers {
 		assert.Equal(t, p.queue, worker.queue, "Worker should be wired to pool queue upon creation")
 	}
+}
+
+func TestPool_Schedule_jobIsEventuallyCompletedByWorker(t *testing.T) {
+	p, _ := NewPool(2, 0)
+	jobIsDone := false
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	p.Schedule(func () {
+		defer wg.Done()
+		jobIsDone = true
+	})
+	wg.Wait()
+	assert.Truef(t, jobIsDone, "After scheduling a worker should eventually complete the job")
 }
