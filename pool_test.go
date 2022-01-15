@@ -65,3 +65,16 @@ func TestPool_Schedule_jobIsEventuallyCompletedByWorker(t *testing.T) {
 	wg.Wait()
 	assert.Truef(t, jobIsDone, "After scheduling a worker should eventually complete the job")
 }
+
+func TestPool_Close_closesJobQueue(t *testing.T) {
+	p, _ := NewPool(2, 0)
+	p.Close()
+	var queueIsClosed bool
+	select {
+	case <-p.queue:
+		queueIsClosed = true
+	default:
+		queueIsClosed = false
+	}
+	assert.True(t, queueIsClosed, "Queue should be closed when Pool is")
+}
