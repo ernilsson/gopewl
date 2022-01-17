@@ -40,7 +40,7 @@ func (p Pool) allWorkersAreOccupied() bool {
 }
 
 func (p Pool) canAddWorker() bool {
-	return p.capacity > 0 && p.capacity < len(p.workers)
+	return p.capacity > 0 &&  len(p.workers) < p.capacity
 }
 
 // Close simply closes the Job channel, which in turn kills all the worker threads.

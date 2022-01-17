@@ -111,6 +111,26 @@ func TestPool_Schedule_jobIsEventuallyCompletedByWorker(t *testing.T) {
 	assert.Truef(t, jobIsDone, "After scheduling a worker should eventually complete the job")
 }
 
+func TestPool_Schedule_createsNewWorkerIfAllWorkersAreOccupiedAndCapacityIsNotReached(t *testing.T) {
+	poolSize := 2
+	poolCapacity := 4
+	p, _ := NewPool(PoolOptions{
+		poolSize: poolSize,
+		poolCapacity: poolCapacity,
+	})
+	for _, worker := range p.workers {
+		worker.waiting = false
+	}
+	p.Schedule(func () {
+	})
+	assert.Equal(
+		t,
+		3,
+		len(p.workers),
+		"Should create new worker when all others are occupied and capacity is not reached",
+	)
+}
+
 func TestPool_Close_closesJobQueue(t *testing.T) {
 	p, _ := NewPool(PoolOptions{
 		poolSize: 2,
