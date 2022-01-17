@@ -121,8 +121,7 @@ func TestPool_Schedule_createsNewWorkerIfAllWorkersAreOccupiedAndCapacityIsNotRe
 	for _, worker := range p.workers {
 		worker.waiting = false
 	}
-	p.Schedule(func () {
-	})
+	p.Schedule(func () {})
 	assert.Equal(
 		t,
 		3,
