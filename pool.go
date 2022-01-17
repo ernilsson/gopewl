@@ -1,9 +1,5 @@
 package gopewl
 
-import (
-	"errors"
-)
-
 // Job is a simple function that takes no arguments and returns no data. This is the basic operation that can be
 // scheduled into the worker pool.
 type Job func()
@@ -24,12 +20,14 @@ func (p *Pool) Schedule(job Job) {
 	p.queue <- job
 }
 
+// addWorker spawns a new worker and wires it up to the Pool
 func (p *Pool) addWorker() {
 	w := newWorker(p.queue)
 	p.workers = append(p.workers, w)
 	go w.run()
 }
 
+// allWorkersAreOccupied returns true if all current workers are busy processing a job at the time of calling
 func (p Pool) allWorkersAreOccupied() bool {
 	for _, worker := range p.workers {
 		if worker.waiting {
@@ -39,6 +37,7 @@ func (p Pool) allWorkersAreOccupied() bool {
 	return true
 }
 
+// canAddWorker returns true if the Pool has an explicit capacity that has not been reached
 func (p Pool) canAddWorker() bool {
 	return p.capacity > 0 &&  len(p.workers) < p.capacity
 }
@@ -48,24 +47,30 @@ func (p *Pool) Close() {
 	close(p.queue)
 }
 
+// PoolOptions contains fields used to construct a Pool type.
 type PoolOptions struct {
+	// poolSize refers to the minimum amount of workers that will always be active until the Pool is closed
 	poolSize int
+	// poolCapacity refers to the maximum amount of workers that the Pool can utilise
 	poolCapacity int
+	// queueSize refers to the maximum unprocessed jobs that cab be present before the scheduling of a new Job will
+	// become blocking
 	queueSize int
 }
 
+// validate returns an error if any of the PoolOptions fields contains illegal values
 func (po PoolOptions) validate() error {
 	if po.poolSize <= 0 {
-		return errors.New("pool size must be a positive integer")
+		return ErrNonPositivePoolSize
 	}
 	if po.queueSize < 0 {
-		return errors.New("queue size must be a positive integer or 0")
+		return ErrNegativeQueueSize
 	}
 	if po.poolCapacity > 0 && po.poolCapacity < po.poolSize {
-		return errors.New("pool capacity must be larger than pool size or 0")
+		return ErrIllegalPoolCapacity
 	}
 	if po.poolCapacity < 0 {
-		return errors.New("pool capacity must be a positive integer or 0")
+		return ErrNegativePoolCapacity
 	}
 	return nil
  }
