@@ -47,8 +47,8 @@ func (p *Pool) Close() {
 	close(p.queue)
 }
 
-// PoolOptions contains fields used to construct a Pool type.
-type PoolOptions struct {
+// PoolOpts contains fields used to construct a Pool type.
+type PoolOpts struct {
 	// poolSize refers to the minimum amount of workers that will always be active until the Pool is closed
 	poolSize int
 	// poolCapacity refers to the maximum amount of workers that the Pool can utilise
@@ -58,8 +58,8 @@ type PoolOptions struct {
 	queueSize int
 }
 
-// validate returns an error if any of the PoolOptions fields contains illegal values
-func (po PoolOptions) validate() error {
+// validate returns an error if any of the PoolOpts fields contains illegal values
+func (po PoolOpts) validate() error {
 	if po.poolSize <= 0 {
 		return ErrNonPositivePoolSize
 	}
@@ -77,7 +77,7 @@ func (po PoolOptions) validate() error {
 
 // NewPool returns a Pool with the amount of workers specified in `poolSize` and a queue with the buffer size
 // of `queueSize`
-func NewPool(opts PoolOptions) (*Pool, error) {
+func NewPool(opts PoolOpts) (*Pool, error) {
 	if err := opts.validate(); err != nil {
 		return nil, err
 	}
