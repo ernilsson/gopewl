@@ -130,6 +130,25 @@ func TestPool_Schedule_createsNewWorkerIfAllWorkersAreOccupiedAndCapacityIsNotRe
 	)
 }
 
+func TestPool_Schedule_doesNotCreateWorkerIfAllWorkersAreOccupiedAndCapacityIsReached(t *testing.T) {
+	poolSize := 2
+	poolCapacity := 2
+	p, _ := NewPool(PoolOptions{
+		poolSize: poolSize,
+		poolCapacity: poolCapacity,
+	})
+	for _, worker := range p.workers {
+		worker.waiting = false
+	}
+	p.Schedule(func () {})
+	assert.Equal(
+		t,
+		2,
+		len(p.workers),
+		"Should create new worker when all others are occupied and capacity is not reached",
+	)
+}
+
 func TestPool_Close_closesJobQueue(t *testing.T) {
 	p, _ := NewPool(PoolOptions{
 		poolSize: 2,
