@@ -3,7 +3,7 @@ A simple package allowing quick capping of goroutines for rudimentary asynchrono
 
 ## Example
 The API is trivial to use. Simply create a new pool and start scheduling jobs to it.
-```
+```go
 const numOfWorkers = 4
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 ```
 
 To notify the caller when a set of tasks have been completed, use the built-in Go `sync.WaitGroup{}` as shown below.
-```
+```go
 const numOfWorkers = 4
 
 func main() {
