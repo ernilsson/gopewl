@@ -9,7 +9,7 @@ import (
 
 func TestNewPool_returnsErrorWithNegativePoolSize(t *testing.T) {
 	poolSize := -1
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: poolSize,
 	})
 	assert.NotNilf(t, err, "Should return error if pool size < 0")
@@ -17,7 +17,7 @@ func TestNewPool_returnsErrorWithNegativePoolSize(t *testing.T) {
 
 func TestNewPool_returnsErrorWithZeroPoolSize(t *testing.T) {
 	poolSize := 0
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: poolSize,
 	})
 	assert.NotNilf(t, err, "Should return error if pool size = 0")
@@ -25,7 +25,7 @@ func TestNewPool_returnsErrorWithZeroPoolSize(t *testing.T) {
 
 func TestNewPool_returnsErrorWithNegativePoolCapacity(t *testing.T) {
 	poolCapacity := -1
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: 1,
 		poolCapacity: poolCapacity,
 	})
@@ -34,7 +34,7 @@ func TestNewPool_returnsErrorWithNegativePoolCapacity(t *testing.T) {
 
 func TestNewPool_returnsErrorWithNonZeroPoolCapacityLargerThanPoolSize(t *testing.T) {
 	poolCapacity := 1
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: 2,
 		poolCapacity: poolCapacity,
 	})
@@ -43,7 +43,7 @@ func TestNewPool_returnsErrorWithNonZeroPoolCapacityLargerThanPoolSize(t *testin
 
 func TestNewPool_returnsNoErrorWithZeroPoolCapacity(t *testing.T) {
 	poolCapacity := 0
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: 1,
 		poolCapacity: poolCapacity,
 	})
@@ -52,7 +52,7 @@ func TestNewPool_returnsNoErrorWithZeroPoolCapacity(t *testing.T) {
 
 func TestNewPool_returnsNoErrorWithPositivePoolSize(t *testing.T) {
 	poolSize := 1
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: poolSize,
 	})
 	assert.Nilf(t, err, "Should not return error if pool size > 0")
@@ -61,7 +61,7 @@ func TestNewPool_returnsNoErrorWithPositivePoolSize(t *testing.T) {
 func TestNewPool_spawnsCorrectNumberOfGoroutines(t *testing.T) {
 	initialNumberOfGoRoutines := runtime.NumGoroutine()
 	poolSize:= 2
-	NewPool(PoolOptions{
+	NewPool(PoolOpts{
 		poolSize: poolSize,
 	})
 	numberOfGoroutines := runtime.NumGoroutine() - initialNumberOfGoRoutines
@@ -70,7 +70,7 @@ func TestNewPool_spawnsCorrectNumberOfGoroutines(t *testing.T) {
 
 func TestNewPool_returnsErrorWithNegativeQueueSize(t *testing.T) {
 	queueSize := -1
-	_, err := NewPool(PoolOptions{
+	_, err := NewPool(PoolOpts{
 		poolSize: 1,
 		queueSize: queueSize,
 	})
@@ -79,7 +79,7 @@ func TestNewPool_returnsErrorWithNegativeQueueSize(t *testing.T) {
 
 func TestNewPool_createsCorrectlyBufferedChannel(t *testing.T) {
 	queueSize := 2
-	p, _ := NewPool(PoolOptions{
+	p, _ := NewPool(PoolOpts{
 		poolSize: 1,
 		queueSize: queueSize,
 	})
@@ -88,7 +88,7 @@ func TestNewPool_createsCorrectlyBufferedChannel(t *testing.T) {
 }
 
 func TestNewPool_wiresWorkersWithChannel(t *testing.T) {
-	p, _ := NewPool(PoolOptions{
+	p, _ := NewPool(PoolOpts{
 		poolSize: 2,
 	})
 	for _, worker := range p.workers {
@@ -97,7 +97,7 @@ func TestNewPool_wiresWorkersWithChannel(t *testing.T) {
 }
 
 func TestPool_Schedule_jobIsEventuallyCompletedByWorker(t *testing.T) {
-	p, _ := NewPool(PoolOptions{
+	p, _ := NewPool(PoolOpts{
 		poolSize: 2,
 	})
 	jobIsDone := false
@@ -114,7 +114,7 @@ func TestPool_Schedule_jobIsEventuallyCompletedByWorker(t *testing.T) {
 func TestPool_Schedule_createsNewWorkerIfAllWorkersAreOccupiedAndCapacityIsNotReached(t *testing.T) {
 	poolSize := 2
 	poolCapacity := 4
-	p, _ := NewPool(PoolOptions{
+	p, _ := NewPool(PoolOpts{
 		poolSize: poolSize,
 		poolCapacity: poolCapacity,
 	})
@@ -133,7 +133,7 @@ func TestPool_Schedule_createsNewWorkerIfAllWorkersAreOccupiedAndCapacityIsNotRe
 func TestPool_Schedule_doesNotCreateWorkerIfAllWorkersAreOccupiedAndCapacityIsReached(t *testing.T) {
 	poolSize := 2
 	poolCapacity := 2
-	p, _ := NewPool(PoolOptions{
+	p, _ := NewPool(PoolOpts{
 		poolSize: poolSize,
 		poolCapacity: poolCapacity,
 	})
@@ -150,7 +150,7 @@ func TestPool_Schedule_doesNotCreateWorkerIfAllWorkersAreOccupiedAndCapacityIsRe
 }
 
 func TestPool_Close_closesJobQueue(t *testing.T) {
-	p, _ := NewPool(PoolOptions{
+	p, _ := NewPool(PoolOpts{
 		poolSize: 2,
 	})
 	p.Close()
