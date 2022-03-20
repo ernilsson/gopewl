@@ -51,6 +51,37 @@ func main() {
 }
 ```
 
+### Scheduling with delay
+To schedule a job that should run after a given duration, use the `ScheduleWithDelay()` receiver function instead. It 
+accepts an additional parameter `delay` and spawns an extra goroutine per call that handles the delaying. The following example
+schedules to job to run one second in the future.
+
+```go
+package main
+
+import (
+	"github.com/ernilsson/gopewl"
+	"time"
+)
+
+func main() {
+	pool, err := gopewl.NewPool(gopewl.PoolOpts{
+		poolSize:  4,
+		queueSize: 0,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer pool.Close()
+	for i := 0; i < 10; i++ {
+		pool.ScheduleWithDelay(func() {
+			// Perform async processing here
+		}, time.Second)
+	}
+	// Continue sync processing here
+}
+```
+
 ## API
 ### Pool 
 The pool type has two receiver methods, both of which are explained below.
